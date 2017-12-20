@@ -15,7 +15,8 @@ int main(int argc, char *argv[]) {
   string distribution_type = argv[1];
   int repetitions = atoi(argv[2]);
 
-  cout << distribution_type <<" "<< repetitions << '\n';
+  Simulator s = Simulator(distribution_type, repetitions);
+  s.run();
 
   return 0;
 }

@@ -16,13 +16,14 @@
 #define ROLLS  1000000
 
 class Simulator {
+
   double next = -1;
   double end = -1;
   double moment = 0;
   std::queue<int> dist_end;
   bool status_server = true;
 
-  std::string distribution_type = NORMAL;
+  std::string distribution_type;
   std::queue<int> qu;
   int repetitions = 1;
   double average_time_value = 4.0;
@@ -34,16 +35,19 @@ class Simulator {
   int requests_received = 0;
   int requests_attended = 0;
 
-private:
-
-    int current_time() {
-      return clock();
-    }
 
 public:
 
+    Simulator() { }
+
+    Simulator(std::string distribution_type, int repetitions) {
+      this->distribution_type = distribution_type;
+      this->duration = repetitions;
+    }
+
     void run() {
       // TODO Set paramenters
+      printf("running ...\n");
     }
 
     void simular() {
@@ -113,7 +117,27 @@ public:
 
     void status() {
       // TODO Print the simulator status
-      printf("%s {\n\t params: [] \n} \n", NORMAL);
+      printf("Simulation { \n\t distribution_type: %s,", getTypeDistribution().c_str());
+      printf("\n\t params: [],");
+      printf("\n\t duration: %.6f,", duration);
+      printf("\n\t requests_received: %d,", requests_received);
+      printf("\n\t requests_attended: %d,", requests_attended);
+      printf("\n\t waiting_average: %.6f,", waiting_average);
+      printf("\n\t attend_average_time: %.6f", attend_average_time);
+      printf("\n}\n");
     }
 
+    std::string getTypeDistribution() {
+      return this->distribution_type;
+    }
+
+  private:
+
+    int current_time() {
+      return clock();
+    }
+
+    void setTypeDistribution(std::string distribution_type) {
+      this->distribution_type = distribution_type;
+    }
 };
