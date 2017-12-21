@@ -1,5 +1,6 @@
 
 #include <queue>
+#include <vector>
 #include <string>
 #include <random>
 #include <ctime>
@@ -21,6 +22,7 @@ class Simulator {
   double end = -1;
   double moment = 0;
   std::queue<int> dist_end;
+  std::vector<double> samples;
   bool status_server = true;
 
   std::string distribution_type;
@@ -34,7 +36,6 @@ class Simulator {
   double waiting_average = 0;
   int requests_received = 0;
   int requests_attended = 0;
-
 
 public:
 
@@ -131,13 +132,52 @@ public:
       return this->distribution_type;
     }
 
+    std::vector<double> getRandomSamples() {
+      std::vector<double> samples;
+      if (this->getTypeDistribution().compare(NORMAL) == 0) {
+        genNormalRandomSamples(samples, MEAN, STDDEV, ROLLS);
+      }
+      else if (this->getTypeDistribution().compare(EXPONENTIAL) == 0) {
+        genExponentialRandomSamples(samples, STDDEV, ROLLS);
+      }
+      else if (this->getTypeDistribution().compare(UNIFORME) == 0) {
+        genUniformRandomSamples(samples, MEAN, STDDEV, ROLLS);
+      }
+      return samples;
+    }
+
   private:
 
-    int current_time() {
-      return clock();
+    void genNormalRandomSamples(std::vector<double>& samples, double mean, double stddev, int rolls) {
+      std::default_random_engine generator;
+      std::normal_distribution<double> distribution(mean, stddev);
+      for (int i = 0; i < rolls; i++) {
+        samples.push_back( distribution(generator) );
+      }
+    }
+
+    void genExponentialRandomSamples(std::vector<double>& samples, double mean, int rolls) {
+      double lambda = 1.0 / mean;
+      std::default_random_engine generator;
+      std::exponential_distribution<double> distribution(lambda);
+      for (int i = 0; i < rolls; i++) {
+        samples.push_back( distribution(generator) );
+      }
+    }
+
+    void genUniformRandomSamples(std::vector<double>& samples, double mean, double stddev, int rolls) {
+      std::default_random_engine generator;
+      std::uniform_real_distribution<double> distribution(mean, stddev);
+      for (int i = 0; i < rolls; i++) {
+        samples.push_back( distribution(generator) );
+      }
     }
 
     void setTypeDistribution(std::string distribution_type) {
       this->distribution_type = distribution_type;
+    }
+
+    int current_time() {
+      return clock();
     }
 };
