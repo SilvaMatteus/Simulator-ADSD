@@ -24,7 +24,7 @@
 
 class Simulator {
 
-  double next = -1;
+  double next_request = -1;
   double completed = -1;
   int moment = 0;
   std::vector<double> dist_end;
@@ -65,6 +65,8 @@ public:
       this->setNrOfRepetitions(REP);
       this->setRolls(ROLLS);
       this->setDuration(EPS);
+
+      //freopen("results_exponential_distribution.txt", "w", stdin);
     }
 
     Simulator(std::string distribution_type=NORMAL, double mean=MEAN, double stddev=STDDEV, int rolls=ROLLS, int repetitions=REP, int duration=EPS) {
@@ -94,7 +96,7 @@ public:
           std::string result;
 
           this->moment = 0;
-          this->next = -1;
+          this->next_request = -1;
           this->completed = -1;
 
           while (!this->qu.empty()) qu.pop();
@@ -134,7 +136,7 @@ public:
 
             }
 
-            if (next <= diff(current_time(), start))
+            if (next_request <= diff(current_time(), start))
             {
               requests_received += 1;
               scheduling(distribution);
@@ -158,7 +160,7 @@ public:
 
     void scheduling(std::vector<double>& distribution) {
       if (this->moment < distribution.size())
-        this->next = std::fabs(distribution[this->moment] );
+        this->next_request = std::fabs(distribution[this->moment] );
       this->moment += 1;
     }
 
