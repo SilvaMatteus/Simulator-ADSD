@@ -5,6 +5,9 @@
 #include <random>
 #include <ctime>
 #include <algorithm>
+#include <iomanip>
+#include <chrono>
+#include <fstream>
 
 // distribution types
 #define NORMAL "normal"
@@ -13,19 +16,26 @@
 
 // distribution parameters
 #define MEAN   1
-#define STDDEV 0.1
+#define STDDEV 0.4
 #define ROLLS  1000000
+
+#define REP 10
+#define EPS 5
 
 class Simulator {
 
   double next = -1;
-  double end = -1;
-  double moment = 0;
-  std::queue<int> dist_end;
+  double completed = -1;
+  int moment = 0;
+  std::vector<double> dist_end;
   std::vector<double> samples;
   bool status_server = true;
 
   std::string distribution_type;
+  double mean;
+  double stddev;
+  double rolls;
+
   std::queue<int> qu;
   int repetitions = 1;
   double average_time_value = 4.0;
@@ -39,32 +49,76 @@ class Simulator {
 
 public:
 
-    Simulator() { }
+    Simulator() {
+      this->setTypeDistribution(NORMAL);
+      this->setMean(MEAN);
+      this->setStdDeviation(STDDEV);
+      this->setNrOfRepetitions(REP);
+      this->setRolls(ROLLS);
+      this->setDuration(EPS);
+    }
 
-    Simulator(std::string distribution_type, int repetitions) {
-      this->distribution_type = distribution_type;
-      this->duration = repetitions;
+    Simulator(std::string distribution_type=NORMAL, int repetitions=REP) {
+      this->setTypeDistribution(distribution_type);
+      this->setMean(MEAN);
+      this->setStdDeviation(STDDEV);
+      this->setNrOfRepetitions(REP);
+      this->setRolls(ROLLS);
+      this->setDuration(EPS);
+    }
+
+    Simulator(std::string distribution_type=NORMAL, double mean=MEAN, double stddev=STDDEV, int rolls=ROLLS, int repetitions=REP, int duration=EPS) {
+      this->setTypeDistribution(distribution_type);
+      this->setMean(mean);
+      this->setStdDeviation(stddev);
+      this->setNrOfRepetitions(repetitions);
+      this->setRolls(rolls);
+      this->setDuration(duration);
     }
 
     void run() {
       // TODO Set paramenters
       printf("running ...\n");
+      genExponentialRandomSamples(this->dist_end, MEAN, ROLLS);
+      simular();
     }
 
     void simular() {
       double start;
-      for (int i = 0; i < repetitions; i++) {
-          start = 0; // get current time, same as timer = time(NULL)
+      for (int i = 0; i < repetitions; i++)
+      {
+          std::vector<double> distribution(getRandomSamples());
+          start = current_time();
           int queue_requests = 0;
           int queue_counter = 0;
           std::string result;
-          std::cout << "repetition #" << i << ": \n";
 
-          scheduling();
-          while (duration > std::fabs(current_time() - start)) {
+          this->moment = 0;
+          this->next = -1;
+          this->completed = -1;
 
-            // TODO when it reaches the final moment (time) of the server's use
-            if (dist_end.back() <= std::fabs(current_time() - start))
+          while (!this->qu.empty()) qu.pop();
+
+          this->requests_received = 0;
+          this->requests_attended = 0;
+          this->waiting_average = 0;
+          this->attend_average_time = 0;
+          this->attend_time = 0;
+          this->server_start_time = 0;
+
+          std::cout << "repetition #" << (i+1) << ": \n";
+
+          scheduling(distribution);
+
+          while (duration > diff(current_time(), start) ) {
+
+            double finished;
+            if (this->completed < 0)
+              finished = dist_end.back();
+            else
+              finished = dist_end[this->completed];
+
+            if (finished <= diff(current_time(), start))
             {
               requests_attended += 1;
               double exit_time = current_time();
@@ -76,15 +130,14 @@ public:
                 qu.pop();
               }
 
-              attend_time += std::fabs(exit_time - server_start_time);
-              attend_time /= double(CLOCKS_PER_SEC) * 1000; // ms
+              attend_time += diff(exit_time, server_start_time);
+
             }
 
-            // TODO when it reaches the arrival moment in the queue
-            if (next <= std::fabs(current_time() - start))
+            if (next <= diff(current_time(), start))
             {
               requests_received += 1;
-              scheduling();
+              scheduling(distribution);
               if (status_server)
                 allocate_server();
               else {
@@ -95,36 +148,67 @@ public:
             }
           }
 
-          attend_average_time = attend_time / requests_attended;
-          waiting_average = double(queue_counter) / requests_received;
+          if (requests_attended > 0)
+            attend_average_time = attend_time / requests_attended;
 
+          waiting_average = double(queue_counter) / double(requests_received);
           status();
       }
     }
 
-    void scheduling() {
-      // TODO Calculate the next arrival time based on the distribution
-      printf("%.5f\n", moment);
-      // TODO Calculate the next arrival
-      moment += 1.0;
+    void scheduling(std::vector<double>& distribution) {
+      if (this->moment < distribution.size())
+        this->next = std::fabs(distribution[this->moment] );
+      this->moment += 1;
     }
 
     void allocate_server() {
-      // TODO Change server status and count completed requests
-      status_server = false;
-      end += 1;
-      server_start_time = current_time();
+      this->status_server = false;
+      this->completed += 1;
+      this->server_start_time = current_time();
+    }
+
+    double getMean() {
+      return this->mean;
+    }
+
+    double getStdDeviation() {
+      return this->stddev;
+    }
+
+    int getNrOfRepetitions() {
+      return this->rolls;
+    }
+
+    double getDuration() {
+      return this->duration;
+    }
+
+    int getRequestsAttended() {
+      return this->requests_attended;
+    }
+
+    int getRequestsReceived() {
+      return this->requests_received;
+    }
+
+    double getWaitingAverageTime() {
+      return this->waiting_average;
+    }
+
+    double getAttendAverageTime() {
+      return this->attend_average_time;
     }
 
     void status() {
       // TODO Print the simulator status
       printf("Simulation { \n\t distribution_type: %s,", getTypeDistribution().c_str());
-      printf("\n\t params: [],");
-      printf("\n\t duration: %.6f,", duration);
-      printf("\n\t requests_received: %d,", requests_received);
-      printf("\n\t requests_attended: %d,", requests_attended);
-      printf("\n\t waiting_average: %.6f,", waiting_average);
-      printf("\n\t attend_average_time: %.6f", attend_average_time);
+      printf("\n\t params: {\n\t\t mean: %.5f\n\t\t std_deviation: %.5f\n\t\t rolls: %d\n\t },", getMean(), getStdDeviation(), getNrOfRepetitions());
+      printf("\n\t duration (ms): %.6f,", getDuration());
+      printf("\n\t requests_received: %d,", getRequestsReceived());
+      printf("\n\t requests_attended: %d,", getRequestsAttended());
+      printf("\n\t waiting_average_time (ms): %.6f,", getWaitingAverageTime());
+      printf("\n\t attend_average_time (ms): %.6f", getAttendAverageTime());
       printf("\n}\n");
     }
 
@@ -135,13 +219,13 @@ public:
     std::vector<double> getRandomSamples() {
       std::vector<double> samples;
       if (this->getTypeDistribution().compare(NORMAL) == 0) {
-        genNormalRandomSamples(samples, MEAN, STDDEV, ROLLS);
+        genNormalRandomSamples(samples, this->mean, this->stddev, this->rolls);
       }
       else if (this->getTypeDistribution().compare(EXPONENTIAL) == 0) {
-        genExponentialRandomSamples(samples, STDDEV, ROLLS);
+        genExponentialRandomSamples(samples, this->stddev, this->rolls);
       }
       else if (this->getTypeDistribution().compare(UNIFORME) == 0) {
-        genUniformRandomSamples(samples, MEAN, STDDEV, ROLLS);
+        genUniformRandomSamples(samples, this->mean, this->stddev, this->rolls);
       }
       return samples;
     }
@@ -177,7 +261,31 @@ public:
       this->distribution_type = distribution_type;
     }
 
-    int current_time() {
+    void setMean(double mean) {
+      this->mean = mean;
+    }
+
+    void setStdDeviation(double stddev) {
+      this->stddev = stddev;
+    }
+
+    void setNrOfRepetitions(int repetitions) {
+      this->repetitions = repetitions;
+    }
+
+    void setDuration(int duration) {
+      this->duration = duration;
+    }
+
+    void setRolls(int rolls) {
+      this->rolls = rolls;
+    }
+
+    double diff(double end, double start) {
+        return std::fabs(end - start) / double(CLOCKS_PER_SEC) * 1000;
+    }
+
+    double current_time() {
       return clock();
     }
 };
