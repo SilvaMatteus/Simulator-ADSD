@@ -1,0 +1,140 @@
+simulation 1
+{ 
+	 distribution_type: normal,
+	 params: {
+		 mean: 1.00000
+		 std_deviation: 0.40000
+		 rolls: 1000000
+	 },
+	 duration (ms): 5.000000,
+	 requests_received: 3553,
+	 requests_attended: 848,
+	 waiting_average_time (ms): 1715.365888,
+	 attend_average_time (ms): 0.077305
+}
+simulation 2
+{ 
+	 distribution_type: normal,
+	 params: {
+		 mean: 1.00000
+		 std_deviation: 0.40000
+		 rolls: 1000000
+	 },
+	 duration (ms): 5.000000,
+	 requests_received: 3562,
+	 requests_attended: 443,
+	 waiting_average_time (ms): 1719.839135,
+	 attend_average_time (ms): 0.000196
+}
+simulation 3
+{ 
+	 distribution_type: normal,
+	 params: {
+		 mean: 1.00000
+		 std_deviation: 0.40000
+		 rolls: 1000000
+	 },
+	 duration (ms): 5.000000,
+	 requests_received: 3563,
+	 requests_attended: 443,
+	 waiting_average_time (ms): 1720.327814,
+	 attend_average_time (ms): 0.000194
+}
+simulation 4
+{ 
+	 distribution_type: normal,
+	 params: {
+		 mean: 1.00000
+		 std_deviation: 0.40000
+		 rolls: 1000000
+	 },
+	 duration (ms): 5.000000,
+	 requests_received: 3532,
+	 requests_attended: 443,
+	 waiting_average_time (ms): 1704.328709,
+	 attend_average_time (ms): 0.000194
+}
+simulation 5
+{ 
+	 distribution_type: normal,
+	 params: {
+		 mean: 1.00000
+		 std_deviation: 0.40000
+		 rolls: 1000000
+	 },
+	 duration (ms): 5.000000,
+	 requests_received: 3567,
+	 requests_attended: 443,
+	 waiting_average_time (ms): 1722.319316,
+	 attend_average_time (ms): 0.000194
+}
+simulation 6
+{ 
+	 distribution_type: normal,
+	 params: {
+		 mean: 1.00000
+		 std_deviation: 0.40000
+		 rolls: 1000000
+	 },
+	 duration (ms): 5.000000,
+	 requests_received: 3558,
+	 requests_attended: 443,
+	 waiting_average_time (ms): 1717.889545,
+	 attend_average_time (ms): 0.000210
+}
+simulation 7
+{ 
+	 distribution_type: normal,
+	 params: {
+		 mean: 1.00000
+		 std_deviation: 0.40000
+		 rolls: 1000000
+	 },
+	 duration (ms): 5.000000,
+	 requests_received: 3562,
+	 requests_attended: 443,
+	 waiting_average_time (ms): 1719.816676,
+	 attend_average_time (ms): 0.000201
+}
+simulation 8
+{ 
+	 distribution_type: normal,
+	 params: {
+		 mean: 1.00000
+		 std_deviation: 0.40000
+		 rolls: 1000000
+	 },
+	 duration (ms): 5.000000,
+	 requests_received: 3412,
+	 requests_attended: 443,
+	 waiting_average_time (ms): 1643.056565,
+	 attend_average_time (ms): 0.000199
+}
+simulation 9
+{ 
+	 distribution_type: normal,
+	 params: {
+		 mean: 1.00000
+		 std_deviation: 0.40000
+		 rolls: 1000000
+	 },
+	 duration (ms): 5.000000,
+	 requests_received: 3529,
+	 requests_attended: 443,
+	 waiting_average_time (ms): 1702.839615,
+	 attend_average_time (ms): 0.000181
+}
+simulation 10
+{ 
+	 distribution_type: normal,
+	 params: {
+		 mean: 1.00000
+		 std_deviation: 0.40000
+		 rolls: 1000000
+	 },
+	 duration (ms): 5.000000,
+	 requests_received: 3562,
+	 requests_attended: 443,
+	 waiting_average_time (ms): 1719.716451,
+	 attend_average_time (ms): 0.000192
+}

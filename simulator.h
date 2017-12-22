@@ -65,8 +65,6 @@ public:
       this->setNrOfRepetitions(REP);
       this->setRolls(ROLLS);
       this->setDuration(EPS);
-
-      //freopen("results_exponential_distribution.txt", "w", stdin);
     }
 
     Simulator(std::string distribution_type=NORMAL, double mean=MEAN, double stddev=STDDEV, int rolls=ROLLS, int repetitions=REP, int duration=EPS) {
@@ -79,8 +77,6 @@ public:
     }
 
     void run() {
-      // TODO Set paramenters
-      printf("running ...\n");
       genExponentialRandomSamples(this->dist_end, MEAN, ROLLS);
       simular();
     }
@@ -108,7 +104,7 @@ public:
           this->attend_time = 0;
           this->server_start_time = 0;
 
-          std::cout << "repetition #" << (i+1) << ": \n";
+          std::cout << "simulation " << (i+1) << '\n';
 
           scheduling(distribution);
 
@@ -204,7 +200,7 @@ public:
 
     void status() {
       // TODO Print the simulator status
-      printf("Simulation { \n\t distribution_type: %s,", getTypeDistribution().c_str());
+      printf("{ \n\t distribution_type: %s,", getTypeDistribution().c_str());
       printf("\n\t params: {\n\t\t mean: %.5f\n\t\t std_deviation: %.5f\n\t\t rolls: %d\n\t },", getMean(), getStdDeviation(), getNrOfRepetitions());
       printf("\n\t duration (ms): %.6f,", getDuration());
       printf("\n\t requests_received: %d,", getRequestsReceived());
